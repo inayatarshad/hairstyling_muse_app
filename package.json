@@ -1,0 +1,24 @@
+{
+  "name": "muse-hair-studio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "preview": "next start",
+    "build:worker": "opennextjs-cloudflare build"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.6.5",
+    "next": "^15.5.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.1.1",
+    "lucide-react": "^0.468.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "wrangler": "^4.30.0"
+  }
+}
