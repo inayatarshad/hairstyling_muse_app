@@ -5,3 +5,5 @@ dist/
 .wrangler/
 *.log
 muse-site.tar.gz
+.vercel
+.env*
