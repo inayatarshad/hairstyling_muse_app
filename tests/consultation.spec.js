@@ -48,3 +48,16 @@ test('settings persist after reload', async ({ page }) => {
   await page.reload();
   await expect(page.getByRole('button', { name: /Private browser storage/ })).not.toHaveClass(/on/);
 });
+
+test('live studio detects hair and redraws colour on the uploaded photo', async ({ page }) => {
+  test.skip((page.viewportSize()?.width || 0) < 700, 'Desktop model-load check');
+  test.setTimeout(45000);
+  await page.goto('http://localhost:3000/studio');
+  await page.locator('input[type="file"]').setInputFiles('public/assets/client-types-modern.png');
+  await expect(page.getByText('HAIR MASK READY')).toBeVisible({ timeout: 35000 });
+  const before = await page.locator('.live-canvas canvas').evaluate(canvas => canvas.toDataURL());
+  await page.getByRole('button', { name: 'Copper' }).click();
+  await page.waitForTimeout(700);
+  const after = await page.locator('.live-canvas canvas').evaluate(canvas => canvas.toDataURL());
+  expect(after).not.toBe(before);
+});
