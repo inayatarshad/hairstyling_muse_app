@@ -2,9 +2,9 @@ import React, { createContext, useContext, useEffect, useMemo, useRef, useState 
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Bookmark, Check, CheckCircle2, ChevronRight, CircleUserRound,
-  ClipboardCheck, Clock3, Copy, Download, ExternalLink, GalleryVerticalEnd, HelpCircle,
+  ClipboardCheck, Clock3, Copy, Download, ExternalLink, GalleryVerticalEnd,
   Home, Image as ImageIcon, Layers3, Menu, Palette, Plus, RefreshCw, RotateCcw,
-  Scissors, Settings, Share2, ShieldCheck, SlidersHorizontal, Sparkles, Upload,
+  Scissors, Share2, ShieldCheck, SlidersHorizontal, Sparkles, Upload,
   UserRound, UsersRound, WandSparkles, X
 } from 'lucide-react';
 
@@ -90,7 +90,7 @@ function Shell({children,flush=false}) {
         <NavLink to="/color"><Palette size={18}/>Colour direction</NavLink>
         <NavLink to="/review"><ClipboardCheck size={18}/>Review look</NavLink>
       </nav>
-      <div className="side-bottom"><NavLink to="/help"><HelpCircle size={18}/> Help centre</NavLink><NavLink to="/settings"><Settings size={18}/> Settings</NavLink><NavLink to="/profile" className="profile-mini"><span>MS</span><div>Muse Studio<small>Professional plan</small></div><ChevronRight size={15}/></NavLink></div>
+      <div className="side-bottom"><NavLink to="/profile" className="profile-mini"><span>MS</span><div>Muse Studio<small>Professional plan</small></div><ChevronRight size={15}/></NavLink></div>
     </aside>
     {mobile&&<div className="scrim" onClick={()=>setMobile(false)}/>}
     <main className="main">
@@ -188,7 +188,7 @@ function hexRgb(hex){const n=parseInt(hex.slice(1),16);return[(n>>16)&255,(n>>8)
 
 function Dashboard(){
   const {saved,clients,session}=useApp();const hair=selectedHair(session);
-  return <Shell flush><section className="dashboard-hero"><div><p className="eyebrow light">Professional consultation platform</p><h1>Turn consideration<br/>into <em>confidence.</em></h1><p>Build, visualise and compare personalised hair directions with every client—before the first cut or colour service begins.</p><div><Button to="/consultation/client">Start consultation <ArrowRight size={17}/></Button><Button to="/studio" variant="ghost-light">Open live studio</Button></div><div className="trust"><span><ShieldCheck/>Private client workflow</span><span><CheckCircle2/>On-device hair colour</span></div></div><div className="hero-salon" role="img" aria-label="Stylist cutting hair in a modern salon"><div className="floating-card"><small>LIVE COLOUR STUDIO</small><strong>Adjust on the client</strong><span>Upload · detect hair · refine tone</span></div></div></section>
+  return <Shell flush><section className="dashboard-hero"><div><p className="eyebrow light">Your personal style atelier</p><h1>See yourself,<br/><em>reimagined.</em></h1><p>Explore considered hair, beard, and colour directions—crafted around you, without the commitment.</p><div><Button to="/consultation/client">Start consultation <ArrowRight size={17}/></Button><Button to="/studio" variant="ghost-light">Open live studio</Button></div><div className="trust"><span><ShieldCheck/>Private client workflow</span><span><CheckCircle2/>On-device hair colour</span></div></div><div className="hero-salon" role="img" aria-label="Stylist cutting hair in a modern salon"><div className="floating-card"><small>LIVE COLOUR STUDIO</small><strong>Adjust on the client</strong><span>Upload · detect hair · refine tone</span></div></div></section>
   <section className="dash-content"><div className="metric-row"><article><small>CLIENT PROFILES</small><strong>{clients.length||'08'}</strong><span><UsersRound/> Consultation-ready</span></article><article><small>SAVED DIRECTIONS</small><strong>{saved.length||'12'}</strong><span><Bookmark/> In your lookbook</span></article><article><small>STYLE PRESETS</small><strong>18</strong><span><Scissors/> Hair + grooming</span></article><article><small>COLOUR STORIES</small><strong>10</strong><span><Palette/> Professional tones</span></article></div>
   <div className="section-title"><div><p className="eyebrow">Consultation tools</p><h2>A complete styling conversation</h2></div></div><div className="tool-grid"><Link to="/consultation/client"><span>01</span><WandSparkles/><h3>New consultation</h3><p>Build a complete look through a guided, client-friendly journey.</p><b>Begin <ArrowRight/></b></Link><Link to="/studio"><span>02</span><Palette/><h3>Live colour studio</h3><p>Detect the client’s hair and adjust colour directly on the uploaded portrait.</p><b>Open editor <ArrowRight/></b></Link><Link to="/compare"><span>03</span><Layers3/><h3>Side-by-side compare</h3><p>Help clients decide with up to four saved directions.</p><b>Compare <ArrowRight/></b></Link></div></section>
   </Shell>;
