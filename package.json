@@ -7,18 +7,24 @@
     "dev": "next dev",
     "build": "next build",
     "preview": "next start",
-    "build:worker": "opennextjs-cloudflare build"
+    "build:worker": "opennextjs-cloudflare build",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.6.5",
-    "next": "^15.5.7",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.1.1",
+    "next": "16.2.12",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-router-dom": "7.18.1",
     "lucide-react": "^0.468.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.2",
+    "@playwright/test": "^1.62.0",
     "esbuild": "^0.25.0",
     "wrangler": "^4.30.0"
+  },
+  "overrides": {
+    "postcss": "8.5.23",
+    "sharp": "0.35.3"
   }
 }

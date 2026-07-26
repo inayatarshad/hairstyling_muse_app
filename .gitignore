@@ -7,3 +7,6 @@ dist/
 muse-site.tar.gz
 .vercel
 .env*
+test-results/
+playwright-report/
+muse-*.png
