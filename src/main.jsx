@@ -41,7 +41,8 @@ const initialSession = {
   clientType:'female',clientName:'',photo:'',hair:'w-curtain',beard:'clean',
   length:'Medium',texture:'Soft wave',volume:62,density:'Natural',finish:'Satin',
   fade:'None',parting:'Centre',color:'Espresso',technique:'Solid',warmth:52,
-  colorIntensity:72,renderedPhoto:'',beardLength:'Clean',beardDensity:'Natural',cheek:'Natural',beardShape:'Rounded'
+  colorIntensity:72,renderedPhoto:'',beardLength:'Clean',beardDensity:'Natural',cheek:'Natural',beardShape:'Rounded',
+  editMode:'Hair',identityLock:true,consent:false,matchBeardColor:true,beardRealism:'Realistic growth',referencePhoto:'',volumeLabel:'Natural'
 };
 const initialSettings = {tips:true,privateMode:true,quality:'High fidelity',theme:'light',provider:'Demo engine'};
 const AppContext = createContext(null);
@@ -78,11 +79,11 @@ const coreNav=[
   ['/studio',SlidersHorizontal,'Live colour studio'],['/clients',UsersRound,'Clients'],['/saved',Bookmark,'Saved looks'],['/compare',Layers3,'Compare']
 ];
 function Shell({children,flush=false}) {
-  const [mobile,setMobile]=useState(false); const {pathname}=useLocation(); const {session}=useApp();
-  return <div className="shell">
+  const [mobile,setMobile]=useState(false); const {pathname}=useLocation(); const {session}=useApp(); const isLanding=pathname==='/';
+  return <div className={isLanding?'shell public-shell':'shell'}>
     <aside className={mobile?'sidebar open':'sidebar'}>
       <button className="close-nav" onClick={()=>setMobile(false)}><X size={19}/></button>
-      <Link className="brand" to="/"><span className="brand-mark">M</span><span>MUSE<small>SALON INTELLIGENCE</small></span></Link>
+      <Link className="brand" to="/"><img className="brand-monogram" src="/assets/muse-monogram-cropped.png" alt=""/><span>MUSE<small>SALON INTELLIGENCE</small></span></Link>
       <nav className="nav"><p>Salon workspace</p>{coreNav.map(([to,I,label])=><NavLink key={to} to={to} end={to==='/' } onClick={()=>setMobile(false)}><I size={18}/>{label}</NavLink>)}
         <p className="nav-group">Active consultation</p>
         <NavLink to="/styles/hair"><Scissors size={18}/>Hair selection</NavLink>
@@ -95,12 +96,12 @@ function Shell({children,flush=false}) {
     {mobile&&<div className="scrim" onClick={()=>setMobile(false)}/>}
     <main className="main">
       <header className="topbar"><button className="mobile-menu" onClick={()=>setMobile(true)}><Menu/></button><div className="crumb">Muse <span>/</span> {routeLabel(pathname)}</div><div className="top-actions"><span className="status-dot"/> Secure salon session <Link to="/profile" className="avatar">MS</Link></div></header>
-      <div className={flush?'':'page'}>{children}</div>
+      <div className={flush?'':'page'}>{['/styles/hair','/styles/beard','/color'].includes(pathname)&&<ModeTabs/>}{children}</div>
     </main>
   </div>;
 }
 function routeLabel(path){const labels={'/':'Dashboard','/consultation/client':'Client profile','/consultation/photo':'Portrait capture','/studio':'Live colour studio','/styles/hair':'Hair selection','/styles/beard':'Beard selection','/color':'Colour direction','/review':'Review look','/generate':'Generation','/result':'Result','/saved':'Saved looks','/compare':'Compare','/clients':'Clients','/settings':'Settings','/profile':'Profile','/help':'Help'};return labels[path]||'Studio'}
-function Button({children,to,variant='',onClick,disabled,type='button'}){const c='button '+variant;return to?<Link to={to} className={c}>{children}</Link>:<button type={type} className={c} onClick={onClick} disabled={disabled}>{children}</button>}
+function Button({children,to,variant='',onClick,disabled,type='button'}){const c='button '+variant;return to&&!disabled?<Link to={to} className={c}>{children}</Link>:<button type={type} className={c} onClick={onClick} disabled={disabled}>{children}</button>}
 function PageHead({eyebrow,title,copy,action}){return <div className="page-head"><div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1>{copy&&<p>{copy}</p>}</div>{action}</div>}
 
 function Workflow({current}) {
@@ -186,12 +187,51 @@ function LiveHairEditor({compact=false,onRendered}) {
 }
 function hexRgb(hex){const n=parseInt(hex.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255]}
 
-function Dashboard(){
+function LegacyDashboard(){
   const {saved,clients,session}=useApp();const hair=selectedHair(session);
   return <Shell flush><section className="dashboard-hero"><div><p className="eyebrow light">Your personal style atelier</p><h1>See yourself,<br/><em>reimagined.</em></h1><p>Explore considered hair, beard, and colour directions—crafted around you, without the commitment.</p><div><Button to="/consultation/client">Start consultation <ArrowRight size={17}/></Button><Button to="/studio" variant="ghost-light">Open live studio</Button></div><div className="trust"><span><ShieldCheck/>Private client workflow</span><span><CheckCircle2/>On-device hair colour</span></div></div><div className="hero-salon" role="img" aria-label="Stylist cutting hair in a modern salon"><div className="floating-card"><small>LIVE COLOUR STUDIO</small><strong>Adjust on the client</strong><span>Upload · detect hair · refine tone</span></div></div></section>
   <section className="dash-content"><div className="metric-row"><article><small>CLIENT PROFILES</small><strong>{clients.length||'08'}</strong><span><UsersRound/> Consultation-ready</span></article><article><small>SAVED DIRECTIONS</small><strong>{saved.length||'12'}</strong><span><Bookmark/> In your lookbook</span></article><article><small>STYLE PRESETS</small><strong>18</strong><span><Scissors/> Hair + grooming</span></article><article><small>COLOUR STORIES</small><strong>10</strong><span><Palette/> Professional tones</span></article></div>
   <div className="section-title"><div><p className="eyebrow">Consultation tools</p><h2>A complete styling conversation</h2></div></div><div className="tool-grid"><Link to="/consultation/client"><span>01</span><WandSparkles/><h3>New consultation</h3><p>Build a complete look through a guided, client-friendly journey.</p><b>Begin <ArrowRight/></b></Link><Link to="/studio"><span>02</span><Palette/><h3>Live colour studio</h3><p>Detect the client’s hair and adjust colour directly on the uploaded portrait.</p><b>Open editor <ArrowRight/></b></Link><Link to="/compare"><span>03</span><Layers3/><h3>Side-by-side compare</h3><p>Help clients decide with up to four saved directions.</p><b>Compare <ArrowRight/></b></Link></div></section>
   </Shell>;
+}
+
+function LandingCompare({model='girl'}){
+  const [reveal,setReveal]=useState(56);
+  const before=`/assets/after-${model}.png`;
+  const after=`/assets/before-${model}.png`;
+  return <div className="landing-compare" style={{'--reveal':`${reveal}%`}}>
+    <div className="compare-photo compare-before"><img src={before} alt={`${model} before hairstyle`}/><span>Before</span></div>
+    <div className="compare-photo compare-after"><img src={after} alt={`${model} after hairstyle`}/><span>After</span></div>
+    <div className="compare-divider"><i><ArrowLeft/><ArrowRight/></i></div>
+    <input aria-label="Drag to compare before and after" type="range" min="0" max="100" value={reveal} onChange={e=>setReveal(e.target.value)}/>
+  </div>;
+}
+
+function Dashboard(){
+  const journey=[
+    ['01','Upload','Start with one clear, front-facing portrait.'],
+    ['02','Choose','Explore cuts, beard styles, and colour stories.'],
+    ['03','Customize','Refine texture, length, volume, fade, and finish.'],
+    ['04','Compare','Reveal the difference and keep your best variations.'],
+    ['05','Share','Take a clear visual direction to your stylist.']
+  ];
+  return <Shell flush><div className="landing">
+    <section className="landing-hero">
+      <div className="hero-orb orb-one"/><div className="hero-orb orb-two"/>
+      <nav className="landing-nav"><Link className="landing-wordmark" to="/"><i>M</i><span>MUSE<small>VIRTUAL HAIR STUDIO</small></span></Link><div><a href="#experience">Experience</a><a href="#process">How it works</a><Link to="/consultation/client" className="nav-cta">Try Muse</Link></div></nav>
+      <div className="landing-hero-grid"><div className="hero-copy"><p className="landing-kicker"><Sparkles/> Personal style, visualized</p><h1>See your next look<br/><em>before the cut.</em></h1><p className="hero-lede">Try considered hairstyles, beard shapes, and colour directions while preserving what makes you unmistakably you.</p><div className="hero-actions"><Button to="/consultation/client">Upload your photo <ArrowRight/></Button><a href="#experience">Explore the reveal <span>↓</span></a></div><div className="hero-proof"><span><ShieldCheck/><b>Identity preserved</b><small>Your face stays yours</small></span><span><Layers3/><b>Compare looks</b><small>Keep up to four</small></span><span><Scissors/><b>Stylist ready</b><small>Leave with direction</small></span></div></div>
+      <div className="hero-visual"><div className="glass-tag glass-top"><span>01</span><p><small>SELECTED LOOK</small><strong>Layered Cut</strong></p></div><LandingCompare/></div></div>
+    </section>
+
+    <section className="reveal-section" id="experience"><div className="section-intro"><p className="landing-kicker">The Muse reveal</p><h2>One portrait.<br/><em>A new perspective.</em></h2><p>Move the line between the familiar and the possible. Muse changes the chosen style—not the person wearing it.</p></div><div className="feature-reveal"><div className="glass-tag glass-top"><span>02</span><p><small>SELECTED LOOK</small><strong>Textured Quiff</strong></p></div><LandingCompare model="boy"/></div></section>
+
+    <section className="process-section" id="process"><div className="process-heading"><p className="landing-kicker">A considered process</p><h2>From curiosity<br/>to clarity.</h2><p>No technical controls. No guesswork. Just a calm, guided path toward a look you can understand and share.</p><Button to="/consultation/client" variant="soft">Begin your consultation <ArrowRight/></Button></div><div className="journey-line">{journey.map(([n,title,copy],i)=><article key={n}><div><i>{n}</i>{i<journey.length-1&&<b/>}</div><p><small>STEP {n}</small><strong>{title}</strong><span>{copy}</span></p></article>)}</div></section>
+
+    <section className="landing-values"><article><span>HAIR</span><h3>Shape the silhouette.</h3><p>From precise crops to flowing layers, begin with a style and make every detail your own.</p><Link to="/styles/hair">Explore hairstyles <ArrowRight/></Link></article><article><span>BEARD</span><h3>Refine the balance.</h3><p>Explore grooming directions that work with your face, haircut, and natural growth.</p><Link to="/consultation/client">Explore grooming <ArrowRight/></Link></article><article><span>COLOUR</span><h3>Find your tone.</h3><p>Build depth with natural foundations, highlights, balayage, and expressive colour.</p><Link to="/studio">Open colour studio <ArrowRight/></Link></article></section>
+
+    <section className="landing-cta"><div className="cta-glow"/><p className="landing-kicker">Your next look is closer than you think</p><h2>Ready to meet<br/><em>the next you?</em></h2><p>Start with one portrait. Leave with a direction you can see, compare, and confidently share.</p><Button to="/consultation/client">Start your consultation <ArrowRight/></Button><small><ShieldCheck/> Private by design · Identity preserved · No commitment</small></section>
+    <footer className="landing-footer"><Link className="landing-wordmark" to="/"><i>M</i><span>MUSE<small>VIRTUAL HAIR STUDIO</small></span></Link><p>See yourself, reimagined.</p><span>© 2026 Muse Hair Studio</span></footer>
+  </div></Shell>;
 }
 
 function ClientStep(){
@@ -202,13 +242,24 @@ function ClientStep(){
     <label className="name-field"><span>Client name <small>OPTIONAL</small></span><input value={session.clientName} onChange={e=>update('clientName',e.target.value)} placeholder="e.g. Sofia Rahman"/></label>
     <div className="step-footer"><span><ShieldCheck/> Client data remains in this browser</span><Button onClick={next}>Continue to portrait <ArrowRight size={16}/></Button></div></div></Shell>;
 }
-function PhotoStep(){
+function LegacyPhotoStep(){
   const {session,update}=useApp();const input=useRef();const nav=useNavigate();
   const upload=e=>{const f=e.target.files?.[0];if(!f)return;const reader=new FileReader();reader.onload=()=>update('photo',reader.result);reader.readAsDataURL(f)};
   return <Shell><Workflow current="photo"/><div className="consult-card"><PageHead eyebrow="Step 2 · Portrait" title="Add a clear client photo" copy="A front-facing portrait with even lighting produces the most useful consultation result."/>
     <div className="photo-layout"><div className="photo-stage">{session.photo?<><img src={session.photo} alt="Uploaded portrait"/><button onClick={()=>update('photo','')}><RotateCcw/>Replace portrait</button></>:<button className="photo-upload" onClick={()=>input.current.click()}><span><Upload/></span><h3>Upload client portrait</h3><p>JPG or PNG · front-facing · natural light</p><b>Choose photo</b></button>}</div><div className="photo-guide"><h3>Portrait quality guide</h3>{[['Face clearly visible','Avoid sunglasses and heavy shadows.'],['Neutral head position','Look toward the camera without tilting.'],['Hairline in frame','Leave space above and around the head.'],['Simple background','A clean backdrop improves edge detail.']].map(([a,b])=><div key={a}><CheckCircle2/><p><strong>{a}</strong><span>{b}</span></p></div>)}<button onClick={()=>{update('photo','');nav('/styles/hair')}}>Continue with a demo model</button></div></div>
     <input hidden ref={input} type="file" accept="image/*" onChange={upload}/><div className="step-footer"><Button to="/consultation/client" variant="text"><ArrowLeft/>Back</Button><Button onClick={()=>nav('/styles/hair')}>{session.photo?'Use this portrait':'Use demo portrait'} <ArrowRight/></Button></div></div></Shell>;
 }
+
+function PhotoStep(){
+  const {session,update}=useApp(); const input=useRef(); const nav=useNavigate(); const [checking,setChecking]=useState(false);
+  const upload=e=>{const f=e.target.files?.[0];if(!f)return;setChecking(true);const reader=new FileReader();reader.onload=()=>{update('photo',reader.result);setTimeout(()=>setChecking(false),700)};reader.readAsDataURL(f)};
+  const checks=[['One face visible','Keep only one person in frame.'],['Face is large and clear','Avoid blur, sunglasses and heavy shadows.'],['Full hairline in frame','Leave space above and around the head.'],['Forward-facing pose','Keep the head level in even light.']];
+  return <Shell><Workflow current="photo"/><div className="consult-card"><PageHead eyebrow="Step 2 · Portrait" title="Add a clear client photo" copy="Muse checks the portrait before generation so problems are caught early."/>
+    <div className="photo-layout"><div className="photo-stage">{session.photo?<><img src={session.photo} alt="Uploaded portrait"/><span className={checking?'photo-checking':'photo-approved'}>{checking?<RefreshCw/>:<CheckCircle2/>}{checking?'Checking photograph...':'Portrait ready'}</span><button onClick={()=>update('photo','')}><RotateCcw/>Replace portrait</button></>:<button className="photo-upload" onClick={()=>input.current.click()}><span><Upload/></span><h3>Upload your portrait</h3><p>JPG or PNG · front-facing · natural light</p><b>Choose photo</b></button>}</div><div className="photo-guide"><h3>Portrait quality check</h3>{checks.map(([a,b])=><div key={a}><CheckCircle2/><p><strong>{a}</strong><span>{b}</span></p></div>)}<p className="quality-tip">Your forehead and full hairline should be visible for the most realistic result.</p><button onClick={()=>{update('photo','');nav('/styles/hair')}}>Continue with a demo model</button></div></div>
+    <input hidden ref={input} type="file" accept="image/*" onChange={upload}/><div className="step-footer"><Button to="/consultation/client" variant="text"><ArrowLeft/>Back</Button><Button disabled={checking} onClick={()=>nav('/styles/hair')}>{session.photo?'Use this portrait':'Use demo portrait'} <ArrowRight/></Button></div></div></Shell>;
+}
+
+function ModeTabs(){const {session,update}=useApp();const nav=useNavigate();return <div className="mode-tabs">{['Hair','Beard','Colour'].map(x=><button key={x} disabled={x==='Beard'&&session.clientType!=='male'} className={session.editMode===x?'active':''} onClick={()=>{update('editMode',x);nav(x==='Hair'?'/styles/hair':x==='Beard'?'/styles/beard':'/color')}}>{x}</button>)}</div>}
 
 function HairLibrary(){
   const {session,update}=useApp();const nav=useNavigate();const [filter,setFilter]=useState('All');const styles=hairFor(session.clientType);const visible=filter==='All'?styles:styles.filter(x=>x.length===filter||x.tag===filter);
@@ -220,8 +271,12 @@ function HairLibrary(){
     <div className="step-footer sticky"><Button to="/consultation/photo" variant="text"><ArrowLeft/>Back</Button><div><span>{selectedHair(session).name} selected</span><Button onClick={()=>nav(session.clientType==='male'?'/styles/beard':'/color')}>Continue to {session.clientType==='male'?'beard':'colour'} <ArrowRight/></Button></div></div>
   </Shell>;
 }
-function RefinementPanel(){
+function LegacyRefinementPanel(){
   return <section className="refine-panel"><div><p className="eyebrow">Professional controls</p><h2>Refine the shape</h2><p>These settings stay attached to this direction.</p></div><div><Select label="Length" name="length" options={['Very short','Short','Medium','Long','Extra long']}/><Select label="Texture" name="texture" options={['Straight','Soft wave','Wavy','Curly','Coily']}/><Select label="Parting" name="parting" options={['None','Centre','Slight left','Deep left','Slight right','Deep right']}/><Select label="Finish" name="finish" options={['Matte','Natural','Satin','Glossy','Wet look']}/><Range label="Volume" name="volume"/></div></section>;
+}
+function RefinementPanel(){
+  const {session}=useApp(); const hair=selectedHair(session); const buzz=hair.id==='m-buzz'; const short=['Short','Very short'].includes(hair.length);
+  return <section className="refine-panel"><div><p className="eyebrow">Controls for this style</p><h2>Refine {hair.name}</h2><p>Only compatible choices are shown.</p></div><div>{buzz?<><Select label="Guard length" name="length" options={['Very short','Short']}/><Select label="Fade height" name="fade" options={['None','Low taper','Mid fade','High fade','Skin fade']}/><Select label="Hairline finish" name="finish" options={['Natural','Soft line-up','Sharp line-up']}/></>:<><Select label="Length" name="length" options={['Very short','Short','Medium','Long','Extra long']}/><Select label="Texture" name="texture" options={['Straight','Slightly wavy','Wavy','Curly','Coily']}/>{!short&&<Select label="Parting" name="parting" options={['None','Centre','Slight left','Deep left','Slight right','Deep right']}/>}<Select label="Volume" name="volumeLabel" options={['Sleek','Low','Natural','Full','Voluminous']}/><Select label="Finish" name="finish" options={['Matte','Natural','Satin','Glossy','Wet look']}/>{short&&<Select label="Fade" name="fade" options={['None','Low taper','Mid fade','High fade','Skin fade']}/>}</>}</div></section>;
 }
 function Select({label,name,options}){const {session,update}=useApp();return <label className="select-control"><span>{label}</span><select value={session[name]||options[0]} onChange={e=>update(name,e.target.value)}>{options.map(x=><option key={x}>{x}</option>)}</select></label>}
 function Range({label,name}){const {session,update}=useApp();return <label className="range-control"><span><b>{label}</b><small>{session[name]}%</small></span><input type="range" value={session[name]} onChange={e=>update(name,+e.target.value)}/></label>}
@@ -261,13 +316,24 @@ function ColorLab(){
 }
 function StepTitle({n,title,copy}){return <div className="step-title"><span>{n}</span><div><h3>{title}</h3><p>{copy}</p></div></div>}
 
-function Review(){
+function LegacyReview(){
   const {session}=useApp();const hair=selectedHair(session);const beard=selectedBeard(session);
   const rows=[['Client',session.clientName||`Demo ${session.clientType} model`,'/consultation/client'],['Hair',hair.name,'/styles/hair'],['Texture',`${session.texture} · ${session.length} · ${session.finish}`,'/styles/hair'],...(session.clientType==='male'?[['Beard',beard.name,'/styles/beard']]:[]),['Colour',`${session.color} · ${session.technique}`,'/color']];
   return <Shell><Workflow current="review"/><PageHead eyebrow="Final review" title="Ready to create the look" copy="Confirm every direction before the preview enters the generation pipeline."/>
     <div className="review-layout"><div className="review-visual"><CurrentVisual result/><span>CLIENT PREVIEW</span></div><div className="review-summary"><h2>Consultation summary</h2>{rows.map(([a,b,to])=><div key={a}><span>{a}</span><strong>{b}</strong><Link to={to}>Edit</Link></div>)}<div className="provider-note"><Sparkles/><p><strong>{session.photo?'Client image preserved':'Salon concept engine'}</strong><span>{session.photo?'The uploaded portrait remains the base image; colour is applied to its detected hair mask. Haircut geometry requires the configured synthesis provider.':'Generates a consultation direction from the selected style configuration.'}</span></p></div><Button to="/generate" variant="full">Generate client preview <Sparkles/></Button><small className="consent"><input type="checkbox" defaultChecked/> Client consent confirmed for this consultation.</small></div></div>
     <div className="step-footer"><Button to="/color" variant="text"><ArrowLeft/>Back to colour</Button></div>
   </Shell>;
+}
+
+function Review(){
+  const {session,update}=useApp(); const hair=selectedHair(session); const beard=selectedBeard(session);
+  const rows=[['Hair',hair.name,'/styles/hair'],['Shape',`${session.length} · ${session.texture} · ${session.volumeLabel}`,'/styles/hair'],...(session.clientType==='male'?[['Beard',beard.name,'/styles/beard']]:[]),['Colour',`${session.color} · ${session.technique}`,'/color']];
+  return <Shell><Workflow current="review"/><PageHead eyebrow="Final review" title="Ready to create your look" copy="Confirm the direction, privacy choices, and identity protection before generation."/>
+    <div className="review-layout"><div className="review-visual"><CurrentVisual result/><span>CLIENT PREVIEW</span></div><div className="review-summary"><h2>Look summary</h2>{rows.map(([a,b,to])=><div key={a}><span>{a}</span><strong>{b}</strong><Link to={to}>Edit</Link></div>)}
+      <div className="identity-card"><ShieldCheck/><p><strong>Preserve my identity</strong><span>Only the selected hair or beard region will be edited. Face shape, skin, expression, age, clothing, and background remain unchanged.</span></p><button aria-label="Preserve my identity" className={session.identityLock?'toggle on':'toggle'} onClick={()=>update('identityLock',!session.identityLock)}><i/></button></div>
+      <label className="consent-box"><input type="checkbox" checked={session.consent} onChange={e=>update('consent',e.target.checked)}/><span><strong>I consent to AI image processing</strong><small>I own this photograph or have permission to use it. This demo stores images only in this browser and does not use them for training.</small></span></label>
+      <Button to="/generate" disabled={!session.consent} variant="full">Generate look · Uses 1 credit <Sparkles/></Button>{!session.consent&&<small className="consent-hint">Consent is required before the portrait can be processed.</small>}
+    </div></div><div className="step-footer"><Button to="/color" variant="text"><ArrowLeft/>Back to colour</Button></div></Shell>;
 }
 
 const phases=[
@@ -282,7 +348,7 @@ function Generate(){
   useEffect(()=>{const timers=phases.map((_,i)=>setTimeout(()=>{setActive(i);setPercent([12,34,57,78,94][i])},i*1250));const end=setTimeout(()=>{saveLook();setPercent(100);navigate('/result')},phases.length*1250+700);return()=>{timers.forEach(clearTimeout);clearTimeout(end)}},[]);
   return <Shell><div className="generation-page"><div className="generation-art"><CurrentVisual result/><div className="scan-line"/></div><div className="generation-copy"><p className="eyebrow">Muse render engine</p><h1>Creating the consultation preview</h1><p>Keep this window open while Muse assembles the selected direction.</p><div className="progress-track"><i style={{width:`${percent}%`}}/></div><div className="percent">{percent}%</div><div className="phase-list">{phases.map(([title,copy],i)=><div key={title} className={i<active?'done':i===active?'active':''}><i>{i<active?<Check/>:i===active?<RefreshCw/>:i+1}</i><p><strong>{title}</strong><span>{copy}</span></p></div>)}</div><small><ShieldCheck/> Identity-preservation checks are applied throughout.</small></div></div></Shell>;
 }
-function Result(){
+function LegacyResult(){
   const {session,saveLook}=useApp();const [saved,setSaved]=useState(false);const [copied,setCopied]=useState(false);const hair=selectedHair(session);
   const download=()=>{const a=document.createElement('a');a.href=session.photo||'/assets/'+(session.clientType==='male'?'men-hair-styles.png':'women-hair-styles.png');a.download=`Muse-${hair.id}.png`;a.click()};
   const copy=()=>{navigator.clipboard?.writeText(window.location.href);setCopied(true);setTimeout(()=>setCopied(false),1500)};
@@ -290,6 +356,17 @@ function Result(){
     <div className="result-layout"><div className="final-render"><CurrentVisual result/><span className="render-badge"><CheckCircle2/>PREVIEW COMPLETE</span></div><aside className="result-card"><small>STYLE PRESCRIPTION</small><h2>{hair.name}</h2><p>{session.clientName||'Client'} · {session.clientType==='male'?'Male':'Female'} styling</p><div><span>Shape<strong>{session.length} · {session.texture}</strong></span><span>Finish<strong>{session.finish} · {session.volume}% volume</strong></span>{session.clientType==='male'&&<span>Grooming<strong>{selectedBeard(session).name}</strong></span>}<span>Colour<strong>{session.color} · {session.technique}</strong></span></div><Button variant="full" onClick={()=>{saveLook();setSaved(true)}}>{saved?<Check/>:<Bookmark/>}{saved?'Saved to client':'Save to client'}</Button><Button to="/compare" variant="full soft"><Layers3/>Add to comparison</Button></aside></div>
     <div className="result-actions"><Button to="/styles/hair" variant="text"><ArrowLeft/>Refine this look</Button><Button to="/consultation/client">Start another consultation <Plus/></Button></div>
   </Shell>;
+}
+
+function Result(){
+  const {session,saveLook}=useApp(); const [saved,setSaved]=useState(false); const [view,setView]=useState('result'); const hair=selectedHair(session);
+  const image=session.photo||'/assets/'+(session.clientType==='male'?'men-hair-styles.png':'women-hair-styles.png');
+  const download=()=>{const a=document.createElement('a');a.href=session.renderedPhoto||image;a.download=`Muse-${hair.id}.png`;a.click()};
+  return <Shell><div className="result-head"><div><p className="eyebrow">Consultation complete</p><h1>Your finished direction</h1><p>Compare the result, keep successful variations, or share a clear brief with your stylist.</p></div><div><Button variant="soft" onClick={download}><Download/>Download</Button><Button to="/styles/hair">Create variation <Sparkles/></Button></div></div>
+    <div className="result-view-tabs">{['original','result','side by side'].map(x=><button key={x} className={view===x?'active':''} onClick={()=>setView(x)}>{x}</button>)}</div>
+    <div className={'comparison-stage '+view}>{view==='original'?<div className="compare-pane"><CurrentVisual/><span>ORIGINAL</span></div>:view==='result'?<div className="compare-pane"><CurrentVisual result/><span>RESULT</span></div>:<><div className="compare-pane"><CurrentVisual/><span>ORIGINAL</span></div><div className="compare-pane"><CurrentVisual result/><span>RESULT</span></div></>}</div>
+    <div className="result-layout result-details"><section className="look-summary"><small>LOOK SUMMARY</small><h2>{hair.name}</h2><p>{session.length} · {session.texture} · {session.volumeLabel} volume · {session.fade} · {session.color} · {session.technique}</p><div className="feasibility"><Clock3/><p><strong>Stylist note</strong><span>Bring this preview to a professional to confirm current-length suitability, upkeep, and colour processing needs.</span></p></div></section><aside className="result-card"><Button variant="full" onClick={()=>{saveLook();setSaved(true)}}>{saved?<Check/>:<Bookmark/>}{saved?'Variation kept':'Keep this variation'}</Button><Button to="/compare" variant="full soft"><Layers3/>Compare saved looks</Button><Button to="/review" variant="full text"><RotateCcw/>Regenerate</Button></aside></div>
+    <div className="result-actions"><Button to="/styles/hair" variant="text"><ArrowLeft/>Adjust this look</Button><Button to="/consultation/client">Start another consultation <Plus/></Button></div></Shell>;
 }
 
 function Saved(){
