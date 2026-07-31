@@ -77,36 +77,32 @@ function CategoryRail({ categories, value, onChange }) {
 /* Refinements                                                                 */
 /* -------------------------------------------------------------------------- */
 
-function Refinements({ style, options, onChange }) {
+function Refinements({ style, options, onChange, onClose }) {
   const controls = refinementsFor(style);
-  const [open, setOpen] = useState(false);
 
   if (!controls.length) return null;
 
   return (
-    <section className={`refine ${open ? 'is-open' : ''}`}>
-      <button className="refine__toggle" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
-        <SlidersHorizontal />
-        <span>
-          <strong>Refine this look</strong>
-          <small>{controls.length} controls for {style.name}</small>
-        </span>
-        <ChevronRight className="refine__chev" />
-      </button>
-
-      <div className="refine__body">
+    <section className="refine-view">
+      <header className="refine-view__head">
+        <button onClick={onClose} aria-label="Back to hairstyles"><ChevronLeft /></button>
         <div>
-          {controls.map((control) => (
-            <Bar
-              key={control.key}
-              label={control.label}
-              options={control.range ? undefined : control.options}
-              poles={control.poles}
-              value={options[control.key] ?? control.default}
-              onChange={(value) => onChange(control.key, value)}
-            />
-          ))}
+          <span>REFINE SELECTED LOOK</span>
+          <h2>{style.name}</h2>
+          <p>{controls.length} focused controls</p>
         </div>
+      </header>
+      <div className="refine-view__controls scroll-y">
+        {controls.map((control) => (
+          <Bar
+            key={control.key}
+            label={control.label}
+            options={control.range ? undefined : control.options}
+            poles={control.poles}
+            value={options[control.key] ?? control.default}
+            onChange={(value) => onChange(control.key, value)}
+          />
+        ))}
       </div>
     </section>
   );
@@ -132,6 +128,7 @@ export default function StyleBrowser({
   selectedStyle
 }) {
   const [query, setQuery] = useState('');
+  const [refining, setRefining] = useState(false);
 
   const categories = useMemo(() => categoriesFor(gender), [gender]);
 
@@ -152,6 +149,19 @@ export default function StyleBrowser({
   }, [category, gender, query]);
 
   const activeCategory = categories.find((c) => c.id === category);
+
+  if (refining && selectedStyle) {
+    return (
+      <div className="browser browser--refining">
+        <Refinements
+          style={selectedStyle}
+          options={options}
+          onChange={onOption}
+          onClose={() => setRefining(false)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="browser">
@@ -209,7 +219,16 @@ export default function StyleBrowser({
         )}
       </div>
 
-      {selectedStyle && <Refinements style={selectedStyle} options={options} onChange={onOption} />}
+      {selectedStyle && refinementsFor(selectedStyle).length > 0 && (
+        <button className="refine-launch" onClick={() => setRefining(true)}>
+          <SlidersHorizontal />
+          <span>
+            <strong>Refine this look</strong>
+            <small>{refinementsFor(selectedStyle).length} controls for {selectedStyle.name}</small>
+          </span>
+          <ChevronRight />
+        </button>
+      )}
     </div>
   );
 }

@@ -574,6 +574,77 @@
 .guard--consent span { font-size: var(--t-micro); line-height: 1.55; color: var(--muted); }
 .panel__blocked { margin-top: 10px; text-align: center; font-size: var(--t-micro); color: var(--burgundy); }
 
+/* Keep the complete portrait comfortably inside the stage. */
+.portrait { padding: clamp(28px, 4.5vh, 56px); }
+.portrait canvas {
+  max-width: min(88%, 820px);
+  max-height: 92%;
+  object-fit: contain;
+}
+
+/* Refinement is a dedicated panel view, not an accordion competing with the
+   hairstyle grid. The portrait stays visible while the browser is replaced. */
+.refine-launch {
+  flex: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px var(--sp-5);
+  text-align: left;
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  transition: background var(--dur) var(--ease-out);
+}
+.refine-launch:hover { background: var(--cream); }
+.refine-launch > svg { width: 19px; height: 19px; color: var(--burgundy); flex: none; }
+.refine-launch > svg:last-child { margin-left: auto; color: var(--faint); }
+.refine-launch span { flex: 1; }
+.refine-launch strong { display: block; font-size: var(--t-small); }
+.refine-launch small { display: block; margin-top: 3px; color: var(--muted); font-size: var(--t-micro); }
+
+.browser--refining { background: var(--paper); }
+.refine-view { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.refine-view__head {
+  flex: none;
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 13px;
+  align-items: start;
+  padding: 24px var(--sp-5) 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--white);
+}
+.refine-view__head button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--burgundy);
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.refine-view__head button svg { width: 18px; height: 18px; }
+.refine-view__head span {
+  color: var(--gilt-deep);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+}
+.refine-view__head h2 { margin: 7px 0 3px; font-size: 1.75rem; }
+.refine-view__head p { color: var(--muted); font-size: var(--t-fine); }
+.refine-view__controls {
+  flex: 1;
+  min-height: 0;
+  padding: 22px var(--sp-5) 32px;
+}
+.refine-view__controls .control {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.refine-view__controls .control:first-child { padding-top: 0; }
+
 /* --------------------------------------------------------------------------
    Generation overlay
    -------------------------------------------------------------------------- */

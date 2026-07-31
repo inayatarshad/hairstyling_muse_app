@@ -470,12 +470,12 @@ export const PHOTO_CELLS = {
   women: {
     sheet: '/assets/women-hair-styles.png',
     cells: [
-      { id: 'bob', name: 'Sculpted Bob', pos: '0% 0%' },
-      { id: 'layers', name: 'Long Layers', pos: '50% 0%' },
-      { id: 'pixie', name: 'Modern Pixie', pos: '100% 0%' },
-      { id: 'luxe-waves', name: 'Luxe Waves', pos: '0% 100%' },
-      { id: 'defined-curls', name: 'Defined Curls', pos: '50% 100%' },
-      { id: 'braids', name: 'Braided Crown', pos: '100% 100%' }
+      { id: 'bob', name: 'Sculpted Bob', pos: '0% 0%', landingImage: '/assets/styles/female-sculpted-bob.png' },
+      { id: 'layers', name: 'Long Layers', pos: '50% 0%', landingImage: '/assets/styles/female-long-layers.png' },
+      { id: 'pixie', name: 'Modern Pixie', pos: '100% 0%', landingImage: '/assets/styles/female-pixie-cut.png' },
+      { id: 'luxe-waves', name: 'Luxe Waves', pos: '0% 100%', landingImage: '/assets/styles/female-luxe-waves.png' },
+      { id: 'defined-curls', name: 'Defined Curls', pos: '50% 100%', landingImage: '/assets/styles/female-defined-curls.png' },
+      { id: 'braids', name: 'Braided Crown', pos: '100% 100%', landingImage: '/assets/styles/female-braided-crown.png' }
     ]
   },
   men: {

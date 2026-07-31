@@ -131,8 +131,8 @@ function Hero() {
 
           <Reveal kind="up" delay={200}>
             <p className="lede lede--light hero__lede">
-              Upload one portrait. Try considered hairstyles, beard shapes and colour stories on your
-              own face, and keep everything that makes you unmistakably you.
+              Try considered hairstyles, beard shapes, and colour directions while preserving what
+              makes you unmistakably you.
             </p>
           </Reveal>
 
@@ -141,7 +141,7 @@ function Hero() {
               Upload your photo <GoArrow />
             </Button>
             <Button href="#results" variant="ghost-light" size="lg">
-              See real results
+              Explore the reveal
             </Button>
           </Reveal>
 
@@ -167,7 +167,7 @@ function Hero() {
               before={SHOWCASE[0].before}
               after={SHOWCASE[0].after}
               beforeLabel=""
-              afterLabel="After"
+              afterLabel=""
               start={48}
               className="hero__compare"
             >
@@ -178,6 +178,13 @@ function Hero() {
                   <strong>Layered Cut</strong>
                 </p>
               </div>
+              <div className="hero__identity">
+                <span><ShieldCheck /></span>
+                <p>
+                  <small>IDENTITY LOCK</small>
+                  <strong>Face &amp; expression preserved</strong>
+                </p>
+              </div>
             </Compare>
           </div>
         </Reveal>
@@ -186,6 +193,51 @@ function Hero() {
       <a className="hero__scroll" href="#process" aria-label="Scroll to how it works">
         <span />
       </a>
+    </section>
+  );
+}
+
+/* ========================================================================== */
+/* Styling directions                                                         */
+/* ========================================================================== */
+
+const DIRECTIONS = [
+  {
+    label: 'Hair',
+    title: 'Shape the silhouette.',
+    copy: 'From precise crops to flowing layers, begin with a style and make every detail your own.',
+    action: 'Explore hairstyles',
+    to: '/studio'
+  },
+  {
+    label: 'Beard',
+    title: 'Refine the balance.',
+    copy: 'Explore grooming directions that work with your face, haircut, and natural growth.',
+    action: 'Explore grooming',
+    to: '/studio'
+  },
+  {
+    label: 'Colour',
+    title: 'Find your tone.',
+    copy: 'Build depth with natural foundations, highlights, balayage, and expressive colour.',
+    action: 'Open colour studio',
+    to: '/studio'
+  }
+];
+
+function StylingDirections() {
+  return (
+    <section className="directions">
+      <div className="shell-w directions__grid">
+        {DIRECTIONS.map((item, index) => (
+          <Reveal as="article" key={item.label} kind="up" delay={index * 80}>
+            <span>{item.label}</span>
+            <h2>{item.title}</h2>
+            <p>{item.copy}</p>
+            <Link to={item.to}>{item.action} <ArrowRight /></Link>
+          </Reveal>
+        ))}
+      </div>
     </section>
   );
 }
@@ -308,12 +360,16 @@ function StyleCategories() {
             return (
               <Reveal key={cell.id} kind="up" delay={i * 70} className="photo-card">
                 <Link to="/studio" aria-label={`Try ${cell.name} in the studio`}>
-                  <span
-                    className="photo-card__img"
-                    style={{ backgroundImage: `url(${sheet.sheet})`, backgroundPosition: cell.pos }}
-                    role="img"
-                    aria-label={`${cell.name} reference portrait`}
-                  />
+                  {cell.landingImage ? (
+                    <img className="photo-card__img" src={cell.landingImage} alt={`${cell.name} reference portrait`} />
+                  ) : (
+                    <span
+                      className="photo-card__img"
+                      style={{ backgroundImage: `url(${sheet.sheet})`, backgroundPosition: cell.pos }}
+                      role="img"
+                      aria-label={`${cell.name} reference portrait`}
+                    />
+                  )}
                   <span className="photo-card__body">
                     <strong>{cell.name}</strong>
                     {style?.meta && <em>{style.meta}</em>}
@@ -456,23 +512,15 @@ function Showcase() {
             afterLabel=""
             start={44}
             className="showcase__compare"
-          />
-          <div className="showcase__caption glass glass--dark">
-            <div>
-              <small>CUT</small>
-              <strong>{item.style}</strong>
+          >
+            <div className="showcase__tag">
+              <span>02</span>
+              <p>
+                <small>SELECTED LOOK</small>
+                <strong>{item.style}</strong>
+              </p>
             </div>
-            <div>
-              <small>COLOUR</small>
-              <strong>{item.tone}</strong>
-            </div>
-            <div>
-              <small>IDENTITY</small>
-              <strong>
-                <ShieldCheck /> Preserved
-              </strong>
-            </div>
-          </div>
+          </Compare>
         </Reveal>
       </div>
     </section>
@@ -666,13 +714,12 @@ export default function Landing() {
       <LandingNav />
       <main>
         <Hero />
+        <StylingDirections />
         <HowItWorks />
         <StyleCategories />
         <WhyUs />
         <Showcase />
-        <Testimonials />
         <Faq />
-        <FinalCta />
       </main>
       <Footer />
     </div>
