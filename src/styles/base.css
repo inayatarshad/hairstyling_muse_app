@@ -1,0 +1,222 @@
+/* ==========================================================================
+   Base: reset, document rhythm, shared primitives
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  font-feature-settings: 'kern' 1, 'liga' 1, 'cv11' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 0, 'WONK' 0;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p { margin: 0; text-wrap: pretty; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+a { color: inherit; text-decoration: none; }
+img, svg, canvas, video { display: block; max-width: 100%; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+::selection {
+  background: var(--burgundy);
+  color: var(--white);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gilt);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Screen-reader-only, still focusable */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 999;
+  top: 12px; left: 12px;
+  padding: 12px 20px;
+  background: var(--burgundy);
+  color: var(--white);
+  border-radius: var(--r-pill);
+  font-size: var(--t-fine);
+  font-weight: 600;
+  transform: translateY(-160%);
+  transition: transform var(--dur) var(--ease-out);
+}
+.skip-link:focus-visible { transform: none; }
+
+/* --------------------------------------------------------------------------
+   Shared type helpers
+   -------------------------------------------------------------------------- */
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--burgundy);
+  margin: 0;
+}
+.eyebrow svg { width: 15px; height: 15px; }
+.eyebrow--gilt { color: var(--gilt); }
+.eyebrow--light { color: var(--blush); }
+
+.lede {
+  font-size: var(--t-lede);
+  line-height: var(--lh-relaxed);
+  color: var(--muted);
+  max-width: 60ch;
+}
+.lede--light { color: var(--on-dark-soft); }
+
+.display-em {
+  font-style: normal;
+  background: var(--grad-gilt);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* Keeps the gradient readable on dark sections without a second rule set */
+.on-dark .display-em { --grad-gilt: linear-gradient(120deg, #f2d7c2, var(--champagne) 55%, var(--gilt)); }
+
+/* --------------------------------------------------------------------------
+   Layout primitives
+   -------------------------------------------------------------------------- */
+
+.shell-w { width: 100%; max-width: var(--shell); margin-inline: auto; padding-inline: var(--gutter); }
+.shell-wide { width: 100%; max-width: var(--shell-wide); margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-block: var(--section-y); position: relative; }
+.stack { display: flex; flex-direction: column; }
+
+/* --------------------------------------------------------------------------
+   Scroll reveal. Elements start hidden only when JS has claimed them, so the
+   page is fully readable with JS disabled or if the observer never fires.
+   -------------------------------------------------------------------------- */
+
+[data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+html.js [data-reveal] {
+  opacity: 0;
+  transition:
+    opacity var(--dur-reveal) var(--ease-out),
+    transform var(--dur-reveal) var(--ease-out),
+    filter var(--dur-reveal) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+html.js [data-reveal='up'] { transform: translate3d(0, 34px, 0); }
+html.js [data-reveal='down'] { transform: translate3d(0, -26px, 0); }
+html.js [data-reveal='left'] { transform: translate3d(38px, 0, 0); }
+html.js [data-reveal='right'] { transform: translate3d(-38px, 0, 0); }
+html.js [data-reveal='scale'] { transform: scale(0.94); }
+html.js [data-reveal='blur'] { filter: blur(14px); transform: translate3d(0, 20px, 0); }
+
+html.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal] { opacity: 1; transform: none; filter: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Ambient motion
+   -------------------------------------------------------------------------- */
+
+@keyframes muse-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -22px, 0); }
+}
+@keyframes muse-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  33%  { transform: translate3d(4%, -6%, 0) scale(1.08); }
+  66%  { transform: translate3d(-5%, 4%, 0) scale(0.96); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes muse-spin { to { transform: rotate(360deg); } }
+@keyframes muse-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes muse-pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(201, 146, 111, 0.4); }
+  70% { box-shadow: 0 0 0 18px rgba(201, 146, 111, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(201, 146, 111, 0); }
+}
+@keyframes muse-pop-in {
+  0% { opacity: 0; transform: scale(0.4); }
+  60% { transform: scale(1.14); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes muse-draw { to { stroke-dashoffset: 0; } }
+@keyframes muse-fade-up {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    100deg,
+    var(--champagne) 20%,
+    #fff6ee 40%,
+    var(--gilt) 60%,
+    var(--champagne) 80%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: muse-shimmer 6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text { animation: none; }
+  [class*='orb'], .aurora { animation: none !important; }
+}
