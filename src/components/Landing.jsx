@@ -7,7 +7,7 @@ import {
   ScanFace, Scissors, ShieldCheck, Sparkles, Sun, Upload, X, Zap
 } from 'lucide-react';
 
-import { ADVANTAGES, FAQ, HERO_PROOF, SHOWCASE, STATS, STEPS, TESTIMONIALS } from '../data/content';
+import { ADVANTAGES, FAQ, SHOWCASE, STATS, STEPS, TESTIMONIALS } from '../data/content';
 import { PHOTO_CELLS, STYLE_BY_ID, stylesFor } from '../data/catalog';
 import StylePreview from './StylePreview';
 import { Accordion, Button, Compare, GoArrow, Initials, Rating, Reveal, Segment, Wordmark } from './ui';
@@ -145,20 +145,6 @@ function Hero() {
             </Button>
           </Reveal>
 
-          <div className="hero__proof">
-            {HERO_PROOF.map((item, i) => {
-              const Icon = ICONS[item.icon] || Sparkles;
-              return (
-                <Reveal key={item.title} kind="up" delay={420 + i * 110} className="proof-card">
-                  <span className="proof-card__icon">
-                    <Icon />
-                  </span>
-                  <h3>{item.title}</h3>
-                  <p>{item.copy}</p>
-                </Reveal>
-              );
-            })}
-          </div>
         </div>
 
         <Reveal kind="scale" delay={160} className="hero__visual">

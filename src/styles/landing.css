@@ -990,15 +990,17 @@
 .hero__compare .compare__tag { display: none; }
 
 .hero__inner {
-  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
-  gap: clamp(34px, 4vw, 68px);
+  grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
+  gap: clamp(40px, 5vw, 84px);
 }
+.hero__visual { width: 100%; max-width: 560px; justify-self: center; }
 .hero__compare {
   width: 100%;
   max-width: none;
   max-height: min(80vh, 790px);
   aspect-ratio: 9 / 10;
 }
+.hero__tag { left: -26px; top: 20px; }
 .hero__identity {
   position: absolute;
   z-index: 8;
