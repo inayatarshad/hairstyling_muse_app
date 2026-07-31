@@ -150,28 +150,27 @@ function Hero() {
         <Reveal kind="scale" delay={160} className="hero__visual">
           <div className="hero__frame">
             <Compare
-              before={SHOWCASE[0].before}
-              after={SHOWCASE[0].after}
+              before={SHOWCASE[0].after}
+              after={SHOWCASE[0].before}
               beforeLabel=""
               afterLabel=""
               start={48}
               className="hero__compare"
-            >
-              <div className="hero__tag">
-                <span>01</span>
-                <p>
-                  <small>SELECTED LOOK</small>
-                  <strong>Layered Cut</strong>
-                </p>
-              </div>
-              <div className="hero__identity">
-                <span><ShieldCheck /></span>
-                <p>
-                  <small>IDENTITY LOCK</small>
-                  <strong>Face &amp; expression preserved</strong>
-                </p>
-              </div>
-            </Compare>
+            />
+            <div className="hero__tag">
+              <span>01</span>
+              <p>
+                <small>SELECTED LOOK</small>
+                <strong>Layered Cut</strong>
+              </p>
+            </div>
+            <div className="hero__identity">
+              <span><ShieldCheck /></span>
+              <p>
+                <small>IDENTITY LOCK</small>
+                <strong>Face &amp; expression preserved</strong>
+              </p>
+            </div>
           </div>
         </Reveal>
       </div>
@@ -492,21 +491,20 @@ function Showcase() {
 
         <Reveal kind="scale" className="showcase__stage">
           <Compare
-            before={item.before}
-            after={item.after}
+            before={item.after}
+            after={item.before}
             beforeLabel=""
             afterLabel=""
             start={44}
             className="showcase__compare"
-          >
-            <div className="showcase__tag">
-              <span>02</span>
-              <p>
-                <small>SELECTED LOOK</small>
-                <strong>{item.style}</strong>
-              </p>
-            </div>
-          </Compare>
+          />
+          <div className="showcase__tag">
+            <span>02</span>
+            <p>
+              <small>SELECTED LOOK</small>
+              <strong>{item.style}</strong>
+            </p>
+          </div>
         </Reveal>
       </div>
     </section>
