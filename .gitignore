@@ -10,3 +10,6 @@ muse-site.tar.gz
 test-results/
 playwright-report/
 muse-*.png
+
+# Local editor/agent scratch config
+.claude/

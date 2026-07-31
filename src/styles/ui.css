@@ -1,0 +1,796 @@
+/* ==========================================================================
+   Musè UI kit: buttons, glass surfaces, badges, fields, accordion, tooltips
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+
+.btn {
+  --btn-bg: var(--grad-brand);
+  --btn-fg: var(--white);
+  --btn-lift: -2px;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 26px;
+  border-radius: var(--r-pill);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: var(--t-small);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  box-shadow: var(--sh-md);
+  transition:
+    transform var(--dur) var(--ease-spring),
+    box-shadow var(--dur) var(--ease-out),
+    filter var(--dur) var(--ease-out),
+    opacity var(--dur) var(--ease-out);
+}
+
+.btn svg { width: 18px; height: 18px; flex: none; }
+
+/* The label wraps the caller's children, which are usually text plus an icon.
+   Making it a nowrap flex row stops trailing arrows dropping to a second line. */
+.btn__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+/* Sheen sweep on hover */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.26) 48%, transparent 76%);
+  background-size: 250% 100%;
+  background-position: 180% 0;
+  transition: background-position var(--dur-slow) var(--ease-out);
+}
+
+.btn:hover {
+  transform: translateY(var(--btn-lift));
+  box-shadow: var(--sh-lg);
+  filter: saturate(1.06);
+}
+.btn:hover::before { background-position: -80% 0; }
+.btn:active { transform: translateY(0) scale(0.985); box-shadow: var(--sh-sm); }
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  filter: grayscale(0.35);
+}
+.btn:disabled::before { display: none; }
+
+/* Ripple, injected by the Button component */
+.btn__ripple {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.42);
+  transform: translate(-50%, -50%) scale(0);
+  animation: btn-ripple 620ms var(--ease-out) forwards;
+  pointer-events: none;
+}
+@keyframes btn-ripple {
+  to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn__ripple { display: none; }
+}
+
+/* ---- Variants ---- */
+
+.btn--lg { padding: 19px 34px; font-size: var(--t-body); }
+.btn--sm { padding: 11px 18px; font-size: var(--t-fine); }
+.btn--block { width: 100%; }
+
+.btn--gilt {
+  --btn-bg: var(--grad-gilt);
+  --btn-fg: #2c1008;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 18px 42px -14px rgba(169, 113, 79, 0.6);
+}
+.btn--gilt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 54%);
+  opacity: 0.35;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.btn--gilt:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 26px 62px -16px rgba(169, 113, 79, 0.75),
+    0 0 34px -4px rgba(230, 195, 168, 0.6);
+}
+.btn--gilt:hover::after { opacity: 1; }
+
+/* Glossy on hover: a wet highlight across the top half plus a champagne rim,
+   so the pill picks up light rather than just changing colour. */
+.btn--light {
+  --btn-bg: var(--white);
+  --btn-fg: var(--night);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 14px 34px -12px rgba(12, 3, 5, 0.5);
+}
+.btn--light::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 52%);
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.btn--light:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(230, 195, 168, 0.7),
+    0 22px 52px -14px rgba(12, 3, 5, 0.6),
+    0 0 40px -6px rgba(230, 195, 168, 0.45);
+}
+.btn--light:hover::after { opacity: 1; }
+
+/* Same treatment for the translucent sibling, so the pair reads as a set. */
+.btn--ghost-light::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 56%);
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.btn--ghost-light:hover::after { opacity: 1; }
+
+.btn--soft {
+  --btn-bg: var(--cream);
+  --btn-fg: var(--burgundy);
+  box-shadow: var(--sh-xs);
+}
+.btn--soft:hover { --btn-bg: var(--paper-warm); box-shadow: var(--sh-sm); }
+
+/* Gradient border, transparent core */
+.btn--outline {
+  --btn-fg: var(--burgundy);
+  background: var(--paper);
+  box-shadow: none;
+  padding: 14px 25px;
+}
+.btn--outline::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--grad-gilt);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.btn--outline:hover { background: var(--white); box-shadow: var(--sh-sm); }
+
+.btn--ghost-light {
+  --btn-bg: rgba(255, 255, 255, 0.07);
+  --btn-fg: var(--on-dark);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  backdrop-filter: var(--blur);
+}
+.btn--ghost-light:hover {
+  --btn-bg: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), var(--sh-md);
+}
+
+.btn--quiet {
+  --btn-bg: transparent;
+  --btn-fg: var(--burgundy);
+  box-shadow: none;
+  padding-inline: 12px;
+}
+.btn--quiet:hover { --btn-bg: var(--cream); box-shadow: none; }
+
+.btn--quiet-light { --btn-bg: transparent; --btn-fg: var(--on-dark-soft); box-shadow: none; }
+.btn--quiet-light:hover { --btn-bg: rgba(255, 255, 255, 0.1); --btn-fg: var(--on-dark); }
+
+/* Loading state */
+.btn--loading { pointer-events: none; }
+.btn--loading .btn__label { opacity: 0.55; }
+.btn__spinner {
+  width: 17px; height: 17px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: muse-spin 700ms linear infinite;
+  flex: none;
+}
+
+/* Arrow that nudges on hover */
+.btn__arrow { transition: transform var(--dur) var(--ease-spring); }
+.btn:hover .btn__arrow { transform: translateX(4px); }
+
+/* Text link with animated underline */
+.link-u {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--t-fine);
+  font-weight: 600;
+  color: var(--burgundy);
+  padding-block: 2px;
+}
+.link-u svg { width: 16px; height: 16px; transition: transform var(--dur) var(--ease-spring); }
+.link-u::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 1px; width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur) var(--ease-out);
+}
+.link-u:hover::after { transform: scaleX(1); }
+.link-u:hover svg { transform: translateX(4px); }
+
+/* --------------------------------------------------------------------------
+   Surfaces
+   -------------------------------------------------------------------------- */
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm);
+}
+
+.glass {
+  background: var(--glass-light);
+  border: 1px solid var(--glass-light-line);
+  border-radius: var(--r-lg);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--sh-md);
+}
+
+.glass--dark {
+  background: var(--glass-dark);
+  border-color: var(--glass-dark-line);
+  color: var(--on-dark);
+  box-shadow: 0 24px 60px -22px rgba(12, 3, 5, 0.6);
+}
+
+/* Gradient hairline border that brightens on hover */
+.gilt-edge {
+  position: relative;
+  isolation: isolate;
+}
+.gilt-edge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, rgba(201, 146, 111, 0.55), rgba(201, 146, 111, 0.06) 42%, rgba(201, 146, 111, 0.4));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.75;
+  transition: opacity var(--dur) var(--ease-out);
+}
+.gilt-edge:hover::after { opacity: 1; }
+
+/* Cursor-tracked highlight; --mx/--my set by useSpotlight */
+.spotlight { position: relative; overflow: hidden; }
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(201, 146, 111, 0.16),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+  pointer-events: none;
+}
+.spotlight:hover::before { opacity: 1; }
+
+.lift { transition: transform var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out); }
+.lift:hover { transform: translateY(-7px); box-shadow: var(--sh-lg); }
+
+/* --------------------------------------------------------------------------
+   Badges and pills
+   -------------------------------------------------------------------------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--cream);
+  color: var(--burgundy);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+.badge svg { width: 13px; height: 13px; }
+.badge--new { background: var(--grad-gilt); color: #2c1008; }
+.badge--hot { background: var(--burgundy); color: var(--white); }
+.badge--glass {
+  background: rgba(24, 8, 11, 0.6);
+  color: var(--on-dark);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.badge--quiet { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+/* --------------------------------------------------------------------------
+   Fields
+   -------------------------------------------------------------------------- */
+
+.field { display: block; }
+.field > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--t-fine);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.field > span small {
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.field input[type='text'],
+.field input[type='email'],
+.field select,
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--white);
+  font-size: var(--t-small);
+  transition: border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+}
+.field input:focus,
+.field select:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--burgundy);
+  box-shadow: 0 0 0 4px rgba(77, 14, 19, 0.09);
+}
+
+/* Range slider, styled in both engines */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 26px;
+  background: transparent;
+  cursor: grab;
+}
+.slider:active { cursor: grabbing; }
+.slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--burgundy) var(--fill, 50%), var(--line-strong) var(--fill, 50%));
+}
+.slider::-moz-range-track { height: 4px; border-radius: 2px; background: var(--line-strong); }
+.slider::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--burgundy); }
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1.5px solid var(--burgundy);
+  box-shadow: var(--sh-md);
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+.slider::-moz-range-thumb {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1.5px solid var(--burgundy);
+  box-shadow: var(--sh-md);
+}
+.slider:hover::-webkit-slider-thumb { transform: scale(1.14); }
+.slider:active::-webkit-slider-thumb { transform: scale(1.02); }
+
+/* --------------------------------------------------------------------------
+   Selector bar. Used instead of dropdowns for every refinement control.
+   The fill deepens from rose to burgundy as it travels, and the thumb picks up
+   a glow, so the far end of the bar reads as "more" without printing a number.
+   -------------------------------------------------------------------------- */
+
+.bar { display: block; padding: 13px 0 15px; }
+.bar__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: 11px;
+}
+.bar__head b { font-size: var(--t-fine); font-weight: 600; }
+.bar__head em {
+  font-style: normal;
+  font-size: var(--t-fine);
+  font-weight: 600;
+  color: var(--burgundy);
+  text-align: right;
+}
+
+.bar__track {
+  position: relative;
+  display: block;
+  height: 22px;
+  border-radius: var(--r-pill);
+}
+/* Unfilled groove */
+.bar__track::before {
+  content: '';
+  position: absolute;
+  inset: 8px 0;
+  border-radius: var(--r-pill);
+  background: var(--cream);
+  box-shadow: inset 0 1px 2px rgba(77, 14, 19, 0.12);
+}
+
+/* Full width so the gradient is anchored to the whole track, then clipped to
+   the current value. That way the colour genuinely deepens the further right
+   the bar travels, rather than the same gradient being squashed each time. */
+.bar__fill {
+  position: absolute;
+  inset: 8px 0;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, #c8a49f 0%, #8c3a3c 42%, var(--burgundy) 78%, #3a080d 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  clip-path: inset(0 calc(100% - max(10px, var(--fill, 0%))) 0 0 round var(--r-pill));
+  transition: clip-path var(--dur) var(--ease-out);
+}
+/* Wet highlight along the top of the fill */
+.bar__fill::after {
+  content: '';
+  position: absolute;
+  inset: 1px 1px 45% 1px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0));
+}
+
+.bar__thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--fill, 0%);
+  transform: translate(-50%, -50%);
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #fffdf9, #f0e2d6);
+  box-shadow:
+    0 0 0 1.5px var(--burgundy),
+    0 3px 10px rgba(48, 20, 18, 0.34),
+    0 0 18px -2px rgba(140, 58, 60, 0.7);
+  transition: transform var(--dur-fast) var(--ease-spring), left var(--dur) var(--ease-out);
+  pointer-events: none;
+}
+.bar__track:hover .bar__thumb { transform: translate(-50%, -50%) scale(1.14); }
+
+.bar__ticks {
+  position: absolute;
+  inset: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.bar__ticks i { width: 2px; height: 2px; border-radius: 50%; background: rgba(77, 14, 19, 0.28); }
+
+/* The real control, invisible and full bleed */
+.bar__track input {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: grab;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.bar__track input:active { cursor: grabbing; }
+.bar__track input:focus-visible ~ .bar__thumb,
+.bar__track:has(input:focus-visible) .bar__thumb {
+  box-shadow: 0 0 0 3px var(--gilt), 0 3px 10px rgba(48, 20, 18, 0.34);
+}
+
+.bar__poles {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.bar__poles i {
+  font-style: normal;
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  color: var(--faint);
+}
+
+.control {
+  display: block;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.control__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--t-fine);
+  margin-bottom: 4px;
+}
+.control__top b { font-weight: 600; }
+.control__top small { font-size: var(--t-fine); color: var(--burgundy); font-variant-numeric: tabular-nums; }
+.control select {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-xs);
+  background: var(--white);
+  padding: 9px 12px;
+  font-size: var(--t-fine);
+  color: var(--burgundy);
+  max-width: 190px;
+}
+
+/* Toggle */
+.toggle {
+  position: relative;
+  width: 48px; height: 27px;
+  border-radius: var(--r-pill);
+  background: var(--line-strong);
+  padding: 3px;
+  flex: none;
+  transition: background var(--dur) var(--ease-out);
+}
+.toggle i {
+  display: block;
+  width: 21px; height: 21px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: var(--sh-sm);
+  transition: transform var(--dur) var(--ease-spring);
+}
+.toggle.is-on { background: var(--burgundy); }
+.toggle.is-on i { transform: translateX(21px); }
+
+/* Segmented control. `position: relative` is load-bearing: the sliding thumb
+   is absolutely positioned and must resolve against this box. */
+.segment {
+  position: relative;
+  display: inline-flex;
+  padding: 4px;
+  gap: 2px;
+  border-radius: var(--r-pill);
+  background: var(--cream);
+}
+.segment button {
+  position: relative;
+  padding: 10px 22px;
+  border-radius: var(--r-pill);
+  font-size: var(--t-fine);
+  font-weight: 600;
+  color: var(--muted);
+  transition: color var(--dur) var(--ease-out);
+}
+.segment button.is-active { color: var(--white); }
+.segment__thumb {
+  position: absolute;
+  inset: 4px auto 4px 4px;
+  border-radius: var(--r-pill);
+  background: var(--grad-brand);
+  box-shadow: var(--sh-sm);
+  transition: transform var(--dur) var(--ease-spring), width var(--dur) var(--ease-spring);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Accordion
+   -------------------------------------------------------------------------- */
+
+.acc {
+  border-bottom: 1px solid var(--line);
+}
+.acc__q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  padding: 28px 4px;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  transition: color var(--dur) var(--ease-out);
+}
+.acc__q:hover { color: var(--burgundy); }
+.acc__icon {
+  position: relative;
+  flex: none;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  transition: background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out), transform var(--dur-slow) var(--ease-spring);
+}
+.acc__icon::before,
+.acc__icon::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 13px; height: 1.5px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  transition: transform var(--dur-slow) var(--ease-spring), opacity var(--dur) var(--ease-out);
+}
+.acc__icon::after { transform: translate(-50%, -50%) rotate(90deg); }
+.acc.is-open .acc__icon { background: var(--burgundy); border-color: var(--burgundy); color: var(--white); transform: rotate(180deg); }
+.acc.is-open .acc__icon::after { opacity: 0; transform: translate(-50%, -50%) rotate(0deg); }
+
+.acc__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur-slow) var(--ease-out);
+}
+.acc.is-open .acc__body { grid-template-rows: 1fr; }
+.acc__body > div { overflow: hidden; }
+.acc__body p {
+  font-size: var(--t-small);
+  line-height: var(--lh-relaxed);
+  color: var(--muted);
+  max-width: 72ch;
+  padding: 0 var(--sp-8) 30px 4px;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+}
+.acc.is-open .acc__body p { opacity: 1; transform: none; transition-delay: 90ms; }
+
+/* Fallback for engines without grid-template-rows animation */
+@supports not (grid-template-rows: 1fr) {
+  .acc__body { grid-template-rows: none; height: 0; overflow: hidden; transition: height var(--dur-slow) var(--ease-out); }
+  .acc.is-open .acc__body { height: auto; }
+}
+
+/* --------------------------------------------------------------------------
+   Before / after comparison slider
+   -------------------------------------------------------------------------- */
+
+.compare {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  background: var(--sand);
+  user-select: none;
+  touch-action: pan-y;
+  isolation: isolate;
+}
+.compare__pane { position: absolute; inset: 0; overflow: hidden; }
+/* Fills the pane with whatever content was passed in, but must not catch the
+   absolutely positioned label, which sizes to its own text. */
+.compare__pane > :not(.compare__tag) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.compare__pane--after { clip-path: inset(0 calc(100% - var(--reveal, 50%)) 0 0); }
+
+.compare__tag {
+  position: absolute;
+  bottom: 18px; left: 18px;
+  z-index: 3;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  background: rgba(22, 6, 9, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  color: var(--on-dark);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.compare__pane--before .compare__tag { left: auto; right: 18px; }
+
+.compare__line {
+  position: absolute;
+  z-index: 4;
+  top: 0; bottom: 0;
+  left: var(--reveal, 50%);
+  width: 2px;
+  margin-left: -1px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 0 22px rgba(0, 0, 0, 0.34);
+  pointer-events: none;
+}
+.compare__handle {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 253, 249, 0.96);
+  color: var(--night);
+  display: grid;
+  grid-auto-flow: column;
+  place-items: center;
+  gap: 1px;
+  box-shadow: 0 10px 34px rgba(24, 6, 9, 0.34);
+  transition: transform var(--dur) var(--ease-spring), box-shadow var(--dur) var(--ease-out);
+}
+.compare__handle svg { width: 13px; height: 13px; }
+.compare:hover .compare__handle { transform: translate(-50%, -50%) scale(1.1); }
+.compare.is-dragging .compare__handle { transform: translate(-50%, -50%) scale(0.94); }
+
+/* The real control: a full-bleed transparent range input, so keyboard and
+   pointer both work with no custom event plumbing. */
+.compare__range {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  width: 100%; height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.compare__range:focus-visible ~ .compare__line { box-shadow: 0 0 0 3px var(--gilt); }
+
+/* --------------------------------------------------------------------------
+   Scrollbars
+   -------------------------------------------------------------------------- */
+
+.scroll-x { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.scroll-y { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.scroll-x::-webkit-scrollbar, .scroll-y::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll-x::-webkit-scrollbar-thumb, .scroll-y::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: var(--r-pill);
+}
+.scroll-x::-webkit-scrollbar-track, .scroll-y::-webkit-scrollbar-track { background: transparent; }
+.no-bar { scrollbar-width: none; }
+.no-bar::-webkit-scrollbar { display: none; }
